@@ -18,9 +18,9 @@ const SB_KEY='sb_publishable_aKMJD2l9YxpNxCnWXQBtxw_OkQ-h0i8';
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--g:#07C160;--gb:#ECF9F1;--w:#FF8C00;--r:#E63946;--bg:#F7F8FA;--c:#fff;--t:#1A1A1A;--s:#999;--b:#E8E8E8;--rds:12px}
-body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--t);min-height:100dvh;-webkit-tap-highlight-color:transparent;user-select:none;}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--t);min-height:100dvh;-webkit-tap-highlight-color:transparent;user-select:none;padding-top:env(safe-area-inset-top)}
 .app{max-width:440px;margin:0 auto;padding:0 16px;padding-bottom:90px}
-.page{display:none;padding-top:16px}
+.page{display:none;padding-top:calc(16px + env(safe-area-inset-top))}
 #fm-waste.page.on,#fm-sell.page.on,#fm-expense.page.on{padding-top:0}
 .page.on{display:block}
 
@@ -75,7 +75,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 /* Modal */
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:flex-end;justify-content:center}
 .modal.show{display:flex}
-.modal .mc{background:var(--c);border-radius:20px 20px 0 0;padding:8px 20px 32px;width:100%;max-width:440px;max-height:75vh;overflow-y:auto;padding-bottom:calc(32px + env(safe-area-inset-bottom))}
+.modal .mc{background:var(--c);border-radius:20px 20px 0 0;padding:calc(8px + env(safe-area-inset-top)) 20px 32px;width:100%;max-width:440px;max-height:75vh;overflow-y:auto;padding-bottom:calc(32px + env(safe-area-inset-bottom))}
 .modal .mc .mh{width:36px;height:4px;background:#D8D8D8;border-radius:2px;margin:0 auto 14px}
 .modal .mc .mt{font-size:18px;font-weight:700;text-align:center;margin-bottom:14px}
 
@@ -87,8 +87,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .api.w{background:#ECF9F1}.api.sl{background:#FFF3E8}.api.ex{background:#FFEBEE}
 
 /* Form page - unified layout */
-.form-page{display:flex;flex-direction:column;height:calc(100dvh - 72px)}
-.form-header{display:flex;align-items:center;padding:12px 16px;background:var(--c);flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.04);z-index:10}
+.form-page{display:flex;flex-direction:column;height:100dvh}
+.form-header{display:flex;align-items:center;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;background:var(--c);flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.04);z-index:10}
 .form-back{display:inline-flex;align-items:center;gap:4px;font-size:16px;color:var(--g);cursor:pointer;font-weight:600;padding:4px}
 .form-back:active{opacity:.7}
 .form-title{font-size:18px;font-weight:800;flex:1;text-align:center;margin-right:36px}
@@ -105,8 +105,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .chip:active{transform:scale(.95)}
 .chip.pick{border-color:var(--g);background:var(--gb);color:var(--g)}
 .ig{margin-bottom:14px}.ig label{display:block;font-size:13px;font-weight:600;color:#666;margin-bottom:6px}
-.ig input,.ig select,.ig textarea{width:100%;padding:14px;border:1.5px solid var(--b);border-radius:12px;font-size:16px;font-family:inherit;background:var(--c);-webkit-appearance:none}
-.ig input:focus,.ig select:focus,.ig textarea:focus{outline:none;border-color:var(--g)}
+.ig input,.ig textarea{width:100%;padding:14px;border:1.5px solid var(--b);border-radius:12px;font-size:16px;font-family:inherit;background:var(--c)}
+.ig input:focus,.ig textarea:focus{outline:none;border-color:var(--g)}
+.ig select{width:100%;min-height:52px;padding:14px 40px 14px 16px;border:1.5px solid var(--b);border-radius:12px;font-size:18px;font-weight:600;font-family:inherit;background:var(--c) url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 12px center;background-size:24px;-webkit-appearance:none;appearance:none;cursor:pointer}
+
 .ir{display:flex;gap:10px}.ir .ig{flex:1}.ir .ig.fix{flex:0 0 100px}
 .btn{display:block;width:100%;padding:16px;border:none;border-radius:14px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
 .btn:active{opacity:.85;transform:scale(.98)}
@@ -163,6 +165,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .insight{background:var(--gb);border-radius:var(--rds);padding:14px 16px;margin:12px 0;font-size:14px;color:#444;line-height:1.6}
 .insight b{color:var(--t)}
 
+.load-more{padding:20px;text-align:center;font-size:13px;color:var(--s)}.load-more .lm-spin{display:inline-block;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ci-thumb{width:48px;height:48px;border-radius:12px;overflow:hidden;flex-shrink:0;background:var(--bg)}
+.ci-thumb img{width:100%;height:100%;object-fit:cover}
 .empty{padding:50px 20px;text-align:center}.empty .ee{font-size:52px;display:block;margin-bottom:10px}.empty .et{font-size:15px;color:var(--s)}
 .toast{position:fixed;top:30px;left:50%;transform:translateX(-50%);background:var(--t);color:#fff;padding:12px 24px;border-radius:20px;font-size:14px;font-weight:600;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
@@ -300,7 +306,7 @@ function nav(tab){
   document.querySelector('.tb[data-t="'+tab+'"]')?.classList.add('on');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.getElementById(tab).classList.add('on');
-  if(tab==='home')loadHome();if(tab==='hist')loadHist();if(tab==='sum')loadSum();
+  if(tab==='home'){loadHome(true);setTimeout(setupHomeScroll,800)}if(tab==='hist')loadHist();if(tab==='sum')loadSum();
   window.scrollTo(0,0);
 }
 function openAct(){document.getElementById('act-modal').classList.add('show')}
@@ -308,6 +314,7 @@ function closeAct(){document.getElementById('act-modal').classList.remove('show'
 function openFm(f){
   closeAct();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tab-bar').style.display='none';
   document.getElementById('fm-'+f).classList.add('on');
   if(f==='sell'){loadUSell()}else{sellSet=new Set()}
   window.scrollTo(0,0);
@@ -315,7 +322,7 @@ function openFm(f){
 function goHome(){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.getElementById('tab-bar').style.display='flex';
-  document.getElementById('home').classList.add('on');loadHome();window.scrollTo(0,0);
+  document.getElementById('home').classList.add('on');loadHome(true);setTimeout(setupHomeScroll,1000);window.scrollTo(0,0);
 }
 
 function gotP(e){const f=e.target.files[0];if(!f)return;pf=f;const r=new FileReader();r.onload=ev=>{document.getElementById('pi').src=ev.target.result;['pi','pr'].forEach(id=>document.getElementById(id).style.display='block');['pe','pt'].forEach(id=>document.getElementById(id).style.display='none')};r.readAsDataURL(f)}
@@ -377,13 +384,16 @@ async function svE(){
   goHome();
 }
 
-async function loadHome(){
-  const now=new Date(),today=now.toISOString().slice(0,10),m=now.toISOString().slice(0,7);
+let homePage=0,homeDone=false,homeLoading=false;
+async function loadHome(reset){
+  if(reset){homePage=0;homeDone=false;document.getElementById('recent').innerHTML=''}
+  if(homeDone||homeLoading)return;homeLoading=true;
+  const now=new Date(),m=now.toISOString().slice(0,7);
   const[{data:us},{data:sm},{data:em},{data:rw}]=await Promise.all([
     sb.from('waste_records').select('*').eq('sold',false),
     sb.from('waste_sales').select('total_amount').gte('created_at',m+'-01').lte('created_at',m+'-31'),
     sb.from('expenses').select('amount').gte('created_at',m+'-01').lte('created_at',m+'-31'),
-    sb.from('waste_records').select('*').order('created_at',{ascending:false}).limit(6)
+    sb.from('waste_records').select('*').order('created_at',{ascending:false}).range(homePage*10,(homePage+1)*10-1)
   ]);
   const wi=sm?.reduce((s,r)=>s+Number(r.total_amount),0)||0,me=em?.reduce((s,r)=>s+Number(r.amount),0)||0,uc=us?.length||0;
   document.getElementById('stats').innerHTML=`
@@ -391,10 +401,26 @@ async function loadHome(){
     <div class="scard"><div class="sl">本月支出</div><div class="sv r">¥${me}</div></div>
     <div class="scard wide"><div class="sw-icon">🗑️</div><div class="sw-info"><div class="sl">待卖废品</div><div class="sv g">${uc} 条</div></div></div>`;
   const rd=document.getElementById('recent');
-  if(!rw?.length){rd.innerHTML='<div class="empty"><div class="ee">📝</div><div class="et">点 ＋ 开始记账</div></div>';return}
-  rd.innerHTML=rw.map(r=>`<div class="item" onclick="showDet(${r.id})"><div class="ii w">📦</div><div class="it"><div class="it-t">${r.waste_type} ${r.quantity}${r.unit}</div><div class="it-d"><span>${ta(r.created_at)}</span>${r.notes?`<span class="dot"></span><span>${r.notes}</span>`:''}</div></div>${r.sold?'<span class="ia" style="font-size:13px;color:var(--s)">已卖</span>':'<button class="sell-btn" onclick="event.stopPropagation();quickS('+r.id+')">卖</button>'}</div>`).join('')
+  if(homePage===0&&(!rw||!rw.length)){rd.innerHTML='<div class="empty"><div class="ee">📝</div><div class="et">点 ＋ 开始记账</div></div>';homeDone=true;homeLoading=false;return}
+  if(!rw||rw.length<10)homeDone=true;
+  const cards=rw.map(r=>{
+    const th=r.photo_url?`<div class="ci-thumb"><img src="${r.photo_url}" loading="lazy" onerror="this.style.display='none'"></div>`:'';
+    return`<div class="item" onclick="showDet(${r.id})">${th}<div class="ii w">📦</div><div class="it"><div class="it-t">${r.waste_type} ${r.quantity}${r.unit}</div><div class="it-d"><span>${ta(r.created_at)}</span>${r.notes?`<span class="dot"></span><span>${r.notes}</span>`:''}</div></div>${r.sold?'<span class="ia" style="font-size:13px;color:var(--s)">已卖</span>':'<button class="sell-btn" onclick="event.stopPropagation();quickS('+r.id+')">卖</button>'}</div>`;
+  });
+  rd.insertAdjacentHTML('beforeend',cards.join(''));
+  if(!homeDone){rd.insertAdjacentHTML('beforeend','<div class="load-more" id="load-more"><span class="lm-spin">⏳</span> 上拉加载更多</div>')}
+  homePage++;homeLoading=false;
 }
 
+// IntersectionObserver for infinite scroll
+let homeObs;
+function setupHomeScroll(){
+  if(homeObs)homeObs.disconnect();
+  homeObs=new IntersectionObserver((e)=>{if(e[0].isIntersecting&&!homeLoading&&!homeDone){loadHome()}},{rootMargin:'100px'});
+  const lm=document.getElementById('load-more');if(lm)homeObs.observe(lm);
+  // also observe the recent container for initial setup
+  setTimeout(()=>{const lm2=document.getElementById('load-more');if(lm2)homeObs.observe(lm2)},500);
+}
 function ta(t){const d=new Date(t),n=new Date(),diff=n-d;if(diff<6e4)return'刚刚';if(diff<36e5)return Math.floor(diff/6e4)+'分前';if(diff<864e5)return Math.floor(diff/36e5)+'时前';if(diff<1728e5)return'昨天';if(diff<6048e5)return Math.floor(diff/864e5)+'天前';return d.toLocaleDateString('zh-CN')}
 
 async function showDet(id){
@@ -405,7 +431,7 @@ async function showDet(id){
 }
 function closeDet(){document.getElementById('det-modal').classList.remove('show')}
 function quickS(id){sellSet=new Set([id]);openFm('sell');closeDet();closeAct()}
-async function delR(id){if(!confirm('确定删除？'))return;await sb.from('waste_records').delete().eq('id',id);toast('已删除');closeDet();loadHist();loadHome()}
+async function delR(id){if(!confirm('确定删除？'))return;await sb.from('waste_records').delete().eq('id',id);toast('已删除');closeDet();loadHist();loadHome(true)}
 
 async function loadHist(){
   const f=filt,showS=(f==='all'||f==='waste');
@@ -469,7 +495,7 @@ async function loadSum(){
   document.getElementById('sdetail').innerHTML=dt||'<div class="empty"><div class="ee">📭</div><div class="et">本月暂无记录</div></div>';
 }
 
-loadHome();
+loadHome(true);setTimeout(setupHomeScroll,1000);
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
