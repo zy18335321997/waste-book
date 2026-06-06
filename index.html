@@ -432,36 +432,38 @@ async function loadHome(reset){
   if(reset){homePage=0;homeDone=false;document.getElementById('recent').innerHTML='';statsCache=null}
   if(homeDone||homeLoading)return;homeLoading=true;
   const now=new Date(),today=now.toISOString().slice(0,10),m=now.toISOString().slice(0,7);
-  // calc week start (Monday)
   const dow=now.getDay(),ws=new Date(now);ws.setDate(now.getDate()-(dow===0?6:dow-1));ws.setHours(0,0,0,0);
   const wk=ws.toISOString().slice(0,10);
-  let td,wkSell,uc,wi=0,me=0;
-  if(statsCache&&statsDay===today){td=statsCache.td;wkSell=statsCache.wkSell;uc=statsCache.uc;wi=statsCache.wi;me=statsCache.me}
-  else{
-    const[{count:tc},{data:wks},{count:c},{data:sm},{data:em}]=await Promise.all([
-      sb.from('waste_records').select('id',{count:'exact',head:true}).gte('created_at',today).lte('created_at',today+'T23:59:59'),
-      sb.from('waste_sales').select('total_amount').gte('created_at',wk),
-      sb.from('waste_records').select('id',{count:'exact',head:true}).eq('sold',false),
-      sb.from('waste_sales').select('total_amount').gte('created_at',m+'-01').lte('created_at',m+'-31'),
-      sb.from('expenses').select('amount').gte('created_at',m+'-01').lte('created_at',m+'-31')
-    ]);
-    td=tc||0;wkSell=wks?.reduce((s,r)=>s+Number(r.total_amount),0)||0;uc=c||0;wi=sm?.reduce((s,r)=>s+Number(r.total_amount),0)||0;me=em?.reduce((s,r)=>s+Number(r.amount),0)||0;
-    statsCache={td,wkSell,uc,wi,me};statsDay=today;
-  }
+  // Stats: only fetch on first page
   if(homePage===0){
+    let td,wkSell,uc,wi=0,me=0;
+    if(statsCache&&statsDay===today){td=statsCache.td;wkSell=statsCache.wkSell;uc=statsCache.uc;wi=statsCache.wi;me=statsCache.me}
+    else{
+      const[{count:tc},{data:wks},{count:c},{data:sm},{data:em}]=await Promise.all([
+        sb.from('waste_records').select('id',{count:'exact',head:true}).gte('created_at',today).lte('created_at',today+'T23:59:59'),
+        sb.from('waste_sales').select('total_amount').gte('created_at',wk),
+        sb.from('waste_records').select('id',{count:'exact',head:true}).eq('sold',false),
+        sb.from('waste_sales').select('total_amount').gte('created_at',m+'-01').lte('created_at',m+'-31'),
+        sb.from('expenses').select('amount').gte('created_at',m+'-01').lte('created_at',m+'-31')
+      ]);
+      td=tc||0;wkSell=wks?.reduce((s,r)=>s+Number(r.total_amount),0)||0;uc=c||0;wi=sm?.reduce((s,r)=>s+Number(r.total_amount),0)||0;me=em?.reduce((s,r)=>s+Number(r.amount),0)||0;
+      statsCache={td,wkSell,uc,wi,me};statsDay=today;
+    }
     document.getElementById('stats').innerHTML=`
       <div class="scard"><div class="sl">📅 今日记录</div><div class="sv g">${td} 条</div></div>
       <div class="scard"><div class="sl">💰 本周卖出</div><div class="sv w">¥${wkSell}</div></div>
       <div class="scard"><div class="sl">🗑️ 待卖出</div><div class="sv" style="color:var(--t)">${uc} 条</div></div>
       <div class="scard"><div class="sl">💸 本月支出</div><div class="sv r">¥${me}</div></div>
       <div class="scard wide"><div class="sw-icon">📊</div><div class="sw-info"><div class="sl">本月废品收入</div><div class="sv w">¥${wi}</div></div></div>`;
+  }
+  // Load records
   const{data:rw}=await sb.from('waste_records').select('id,waste_type,quantity,unit,photo_url,notes,sold,created_at').order('created_at',{ascending:false}).range(homePage*10,(homePage+1)*10-1);
   const rd=document.getElementById('recent');
   if(homePage===0&&(!rw||!rw.length)){rd.innerHTML='<div class="empty"><div class="ee">📝</div><div class="et">点 ＋ 开始记账</div></div>';homeDone=true;homeLoading=false;return}
   if(!rw||rw.length<10)homeDone=true;
   const cards=rw.map(r=>renderCard(r));
   rd.insertAdjacentHTML('beforeend',cards.join(''));
-  if(!homeDone){rd.insertAdjacentHTML('beforeend','<div class="load-more" id="load-more"><span class="lm-spin">⏳</span> 上拉加载更多</div>')}
+  if(!homeDone){rd.insertAdjacentHTML('beforeend','<div class="load-more" id="load-more">上拉加载更多</div>')}
   homePage++;homeLoading=false;
 }
 
@@ -476,14 +478,26 @@ function renderCard(r){
     ${r.sold?'<span class="card-badge sold">已卖</span>':'<button class="sell-btn" onclick="event.stopPropagation();quickS('+r.id+')">卖</button>'}
   </div>`;
 }
-// IntersectionObserver for infinite scroll
-let homeObs;
-function setupHomeScroll(){
-  if(homeObs)homeObs.disconnect();
-  homeObs=new IntersectionObserver((e)=>{if(e[0].isIntersecting&&!homeLoading&&!homeDone){loadHome()}},{rootMargin:'200px'});
+
+// Scroll-based load more
+let scrollTicking=false;
+function onHomeScroll(){
+  if(scrollTicking||homeLoading||homeDone)return;
+  scrollTicking=true;
   requestAnimationFrame(()=>{
-    const lm=document.getElementById('load-more');if(lm)homeObs.observe(lm);
+    const lm=document.getElementById('load-more');
+    if(lm){
+      const rect=lm.getBoundingClientRect();
+      if(rect.top<window.innerHeight+200){loadHome()}
+    }
+    scrollTicking=false;
   });
+}
+
+function setupHomeScroll(){
+  const app=document.querySelector('.app');
+  if(app){app.removeEventListener('scroll',onHomeScroll);app.addEventListener('scroll',onHomeScroll,{passive:true})}
+  window.removeEventListener('scroll',onHomeScroll);window.addEventListener('scroll',onHomeScroll,{passive:true});
 }
 function ta(t){const d=new Date(t),n=new Date(),diff=n-d;if(diff<6e4)return'刚刚';if(diff<36e5)return Math.floor(diff/6e4)+'分前';if(diff<864e5)return Math.floor(diff/36e5)+'时前';if(diff<1728e5)return'昨天';if(diff<6048e5)return Math.floor(diff/864e5)+'天前';return d.toLocaleDateString('zh-CN')}
 
