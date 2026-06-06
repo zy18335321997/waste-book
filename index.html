@@ -37,6 +37,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .scard{background:var(--c);border-radius:var(--rds);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .scard .sl{font-size:13px;color:var(--s);margin-bottom:4px}
 .scard .sv{font-size:26px;font-weight:800;letter-spacing:-1px}
+@keyframes shimmer{0%{opacity:.4}50%{opacity:.7}100%{opacity:.4}}
+.sv.skel{animation:shimmer 1.5s ease-in-out infinite;color:var(--b)}
 .scard .sv.g{color:var(--g)}
 .scard .sv.r{color:var(--r)}
 .scard .sv.w{color:var(--w)}
@@ -188,7 +190,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 <!-- HOME -->
 <div class="page on" id="home">
 <div class="top"><div><div class="t-date" id="dnow"></div><div class="t-title">记账本</div></div></div>
-<div class="scards" id="stats"></div>
+<div class="scards" id="stats"><div class="scard"><div class="sl">📅 今日记录</div><div class="sv g">--</div></div><div class="scard"><div class="sl">💰 本周卖出</div><div class="sv w">--</div></div><div class="scard"><div class="sl">🗑️ 待卖出</div><div class="sv">--</div></div><div class="scard"><div class="sl">💸 本月支出</div><div class="sv r">--</div></div><div class="scard wide"><div class="sw-icon">📊</div><div class="sw-info"><div class="sl">本月废品收入</div><div class="sv w">--</div></div></div>
 <div class="sec"><div class="sec-head"><span class="sh-t">最近记录</span><span class="sh-m" onclick="nav('hist')">全部 →</span></div><div id="recent"></div></div>
 </div>
 
@@ -576,7 +578,7 @@ async function loadSum(){
   document.getElementById('sdetail').innerHTML=dt||'<div class="empty"><div class="ee">📭</div><div class="et">本月暂无记录</div></div>';
 }
 
-setTimeout(()=>{loadHome(true);setupHomeScroll()},100);
+loadHome(true);setupHomeScroll();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
