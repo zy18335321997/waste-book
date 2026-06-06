@@ -21,7 +21,7 @@ const SB_KEY='sb_publishable_aKMJD2l9YxpNxCnWXQBtxw_OkQ-h0i8';
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--t);min-height:100dvh;-webkit-tap-highlight-color:transparent;user-select:none;}
 .app{max-width:440px;margin:0 auto;padding:0 16px;padding-bottom:90px}
 .page{display:none;padding-top:16px}
-#fm-sell.page.on{padding-top:0}
+#fm-waste.page.on,#fm-sell.page.on,#fm-expense.page.on{padding-top:0}
 .page.on{display:block}
 
 /* Top */
@@ -48,13 +48,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .sec-head .sh-m{font-size:13px;color:var(--g);cursor:pointer}
 
 /* Item */
-.item{display:flex;align-items:center;padding:14px;background:var(--c);border-radius:var(--rds);margin-bottom:8px;gap:10px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
-.item .ii{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.item{display:flex;align-items:center;padding:16px;background:var(--c);border-radius:16px;margin-bottom:10px;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:all .15s}
+.item:active{background:#F5F5F5;transform:scale(.98)}
+.item .ii{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
 .ii.w{background:#ECF9F1}.ii.s{background:#FFF3E8}.ii.e{background:#FFEBEE}.ii.sa{background:#EBF2FA}
 .item .it{flex:1;min-width:0}
-.item .it .it-t{font-size:15px;font-weight:600}
-.item .it .it-d{font-size:12px;color:var(--s);margin-top:2px}
-.item .ia{font-weight:700;font-size:16px;flex-shrink:0}
+.item .it .it-t{font-size:16px;font-weight:700;margin-bottom:3px}
+.item .it .it-d{font-size:12px;color:var(--s);display:flex;align-items:center;gap:6px}
+.item .it .it-d .dot{width:3px;height:3px;border-radius:50%;background:#CCC;flex-shrink:0}
+.item .ia{font-weight:800;font-size:18px;flex-shrink:0;text-align:right}
 .item .ia.p{color:var(--g)}.item .ia.n{color:var(--r)}.item .ia.o{color:var(--w)}
 
 /* Sell btn */
@@ -84,24 +86,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .apick .ap .api{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
 .api.w{background:#ECF9F1}.api.sl{background:#FFF3E8}.api.ex{background:#FFEBEE}
 
-/* Form */
-.fm{padding-top:4px}
-.fm .fb{display:inline-flex;align-items:center;gap:4px;padding:8px 0;cursor:pointer;font-size:15px;color:var(--s);font-weight:500}
-.fm .ft{font-size:22px;font-weight:700;margin-bottom:16px}
-.photo{width:100%;height:180px;background:var(--bg);border-radius:var(--rds);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;margin-bottom:14px;overflow:hidden;position:relative;border:2px dashed var(--b)}
+/* Form page - unified layout */
+.form-page{display:flex;flex-direction:column;height:calc(100dvh - 72px)}
+.form-header{display:flex;align-items:center;padding:12px 16px;background:var(--c);flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.04);z-index:10}
+.form-back{display:inline-flex;align-items:center;gap:4px;font-size:16px;color:var(--g);cursor:pointer;font-weight:600;padding:4px}
+.form-back:active{opacity:.7}
+.form-title{font-size:18px;font-weight:800;flex:1;text-align:center;margin-right:36px}
+.form-body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch}
+.form-foot{padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));background:var(--c);border-top:1px solid var(--b);flex-shrink:0;box-shadow:0 -1px 3px rgba(0,0,0,.04)}
+
+/* Form elements */
+.photo{width:100%;height:180px;background:var(--bg);border-radius:var(--rds);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;margin-bottom:16px;overflow:hidden;position:relative;border:2px dashed var(--b)}
 .photo img{width:100%;height:100%;object-fit:cover;position:absolute}
-.photo .pe{font-size:36px;z-index:1}.photo .pt{font-size:14px;color:var(--s);z-index:1}
-.photo .pr{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;padding:5px 12px;border-radius:14px;font-size:12px;z-index:2}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.chip{padding:10px 16px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;border:1.5px solid var(--b);background:var(--c)}
+.photo .pe{font-size:40px;z-index:1}.photo .pt{font-size:14px;color:var(--s);z-index:1;margin-top:4px}
+.photo .pr{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;padding:6px 14px;border-radius:16px;font-size:13px;z-index:2}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.chip{padding:12px 18px;border-radius:22px;font-size:15px;font-weight:600;cursor:pointer;border:1.5px solid var(--b);background:var(--c);transition:all .15s}
+.chip:active{transform:scale(.95)}
 .chip.pick{border-color:var(--g);background:var(--gb);color:var(--g)}
-.ig{margin-bottom:12px}.ig label{display:block;font-size:13px;font-weight:600;color:#666;margin-bottom:4px}
-.ig input,.ig select,.ig textarea{width:100%;padding:12px 14px;border:1.5px solid var(--b);border-radius:10px;font-size:16px;font-family:inherit;background:var(--c);-webkit-appearance:none}
+.ig{margin-bottom:14px}.ig label{display:block;font-size:13px;font-weight:600;color:#666;margin-bottom:6px}
+.ig input,.ig select,.ig textarea{width:100%;padding:14px;border:1.5px solid var(--b);border-radius:12px;font-size:16px;font-family:inherit;background:var(--c);-webkit-appearance:none}
 .ig input:focus,.ig select:focus,.ig textarea:focus{outline:none;border-color:var(--g)}
-.ir{display:flex;gap:8px}.ir .ig{flex:1}.ir .ig.fix{flex:0 0 90px}
-.btn{display:block;width:100%;padding:15px;border:none;border-radius:12px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
-.btn:active{opacity:.85}
-.btn.g{background:var(--g);color:#fff}.btn.o{background:var(--w);color:#fff}.btn.lg{padding:17px;font-size:18px}
+.ir{display:flex;gap:10px}.ir .ig{flex:1}.ir .ig.fix{flex:0 0 100px}
+.btn{display:block;width:100%;padding:16px;border:none;border-radius:14px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn:active{opacity:.85;transform:scale(.98)}
+.btn.g{background:var(--g);color:#fff}.btn.o{background:var(--w);color:#fff}
 
 /* Sell list */
 .sell-scroll{max-height:45vh;overflow-y:auto}
@@ -117,24 +126,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .sab .sabb{flex:1;padding:12px;border-radius:12px;font-size:14px;font-weight:700;color:#fff;background:var(--w);border:none;cursor:pointer;text-align:center;font-family:inherit}
 .sab .sabb:active{opacity:.85}
 
-/* Sell header */
-.sell-top{display:flex;align-items:center;justify-content:space-between;padding:4px 0 12px;position:sticky;top:-16px;background:var(--bg);z-index:5;margin-bottom:4px}
-.sell-back{display:inline-flex;align-items:center;gap:4px;font-size:16px;color:var(--g);cursor:pointer;font-weight:600}
-.sell-back:active{opacity:.7}
-.sell-title{font-size:20px;font-weight:800;flex:1;text-align:center}
+/* Sell summary badge */
 .sell-summary{display:flex;align-items:center;gap:6px;background:var(--gb);padding:6px 14px;border-radius:20px;font-size:13px;color:var(--g);font-weight:600}
 .sell-summary b{font-size:14px}
 
-/* Sell bottom - sits above tab bar */
-#fm-sell .fm{padding-bottom:200px}
-.sell-bottom{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);max-width:440px;width:100%;background:rgba(255,255,255,.98);backdrop-filter:blur(10px);padding:12px 16px;padding-bottom:12px;border-top:1px solid var(--b);z-index:101;box-shadow:0 -4px 16px rgba(0,0,0,.06)}
-.sell-bottom-row{display:flex;align-items:center;gap:10px}
-.sell-bottom-sum{flex:1;display:flex;align-items:center;background:var(--bg);border-radius:12px;padding:4px 14px;border:1.5px solid var(--b)}
-.sell-bottom-sum:focus-within{border-color:var(--g)}
-.sell-bottom-sum .sbs-yuan{font-size:22px;font-weight:700;color:var(--w);margin-right:4px;flex-shrink:0}
-.sell-bottom-sum input{flex:1;border:none;background:transparent;padding:14px 4px;font-size:20px;font-weight:700;outline:none;width:100%}
-.sell-bottom-row .btn{flex-shrink:0;width:auto;padding:15px 28px;font-size:16px;border-radius:12px}
-.sell-bottom-row .btn:disabled{opacity:.45}
+/* Sell amount row */
+.sell-amount-row{display:flex;align-items:center;gap:10px}
+.sell-amount-row .sell-amount-input{flex:1;display:flex;align-items:center;background:var(--bg);border-radius:12px;padding:4px 14px;border:1.5px solid var(--b)}
+.sell-amount-row .sell-amount-input:focus-within{border-color:var(--g)}
+.sell-amount-row .say{font-size:22px;font-weight:700;color:var(--w);margin-right:4px;flex-shrink:0}
+.sell-amount-row .sell-amount-input input{flex:1;border:none;background:transparent;padding:14px 4px;font-size:20px;font-weight:700;outline:none;width:100%}
+.sell-amount-row .btn{flex-shrink:0;width:auto;padding:15px 28px;font-size:16px;border-radius:12px}
+.sell-amount-row .btn:disabled{opacity:.45}
 
 /* Detail */
 .detail-img{width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin:10px 0}
@@ -160,7 +163,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .insight{background:var(--gb);border-radius:var(--rds);padding:14px 16px;margin:12px 0;font-size:14px;color:#444;line-height:1.6}
 .insight b{color:var(--t)}
 
-.empty{padding:40px 20px;text-align:center}.empty .ee{font-size:44px;display:block;margin-bottom:8px}.empty .et{font-size:14px;color:var(--s)}
+.empty{padding:50px 20px;text-align:center}.empty .ee{font-size:52px;display:block;margin-bottom:10px}.empty .et{font-size:15px;color:var(--s)}
 .toast{position:fixed;top:30px;left:50%;transform:translateX(-50%);background:var(--t);color:#fff;padding:12px 24px;border-radius:20px;font-size:14px;font-weight:600;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
 #camera{display:none}
@@ -213,49 +216,70 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 </div>
 
 <!-- Waste Form -->
-<div class="page" id="fm-waste"><div class="fm">
-<div class="fb" onclick="goHome()">← 返回</div><div class="ft">📸 记废品</div>
+<div class="page" id="fm-waste">
+<div class="form-page">
+<div class="form-header">
+<div class="form-back" onclick="goHome()">← 返回</div>
+<div class="form-title">📸 记废品</div>
+</div>
+<div class="form-body">
 <div class="photo" id="pb" onclick="document.getElementById('camera').click()"><span class="pe" id="pe">📷</span><span class="pt" id="pt">点击拍照</span><img id="pi" style="display:none"><span class="pr" id="pr" style="display:none" onclick="event.stopPropagation();resetP()">重拍</span></div>
 <input type="file" id="camera" accept="image/*" capture="environment" onchange="gotP(event)">
 <div class="chips" id="chips"><div class="chip pick" data-t="纸板" onclick="pickC(this)">📦 纸板</div><div class="chip" data-t="塑料瓶" onclick="pickC(this)">🧴 塑料瓶</div><div class="chip" data-t="金属" onclick="pickC(this)">🔩 金属</div><div class="chip" data-t="纸张" onclick="pickC(this)">📄 纸张</div><div class="chip" data-t="其他" onclick="pickC(this)">📦 其他</div></div>
 <div class="ir"><div class="ig"><label>数量</label><input type="number" id="rq" placeholder="3.5" step="0.1" min="0.1"></div><div class="ig fix"><label>单位</label><select id="ru"><option value="斤">斤</option><option value="个">个</option><option value="公斤">公斤</option></select></div></div>
 <div class="ig"><label>备注</label><input type="text" id="rn" placeholder="在哪捡的..."></div>
-<button class="btn g lg" onclick="svW()">✅ 记一笔</button>
-</div></div>
+</div>
+<div class="form-foot">
+<button class="btn g" onclick="svW()">✅ 记一笔</button>
+</div>
+</div>
+</div>
 
 <!-- Sell Form -->
-<div class="page" id="fm-sell"><div class="fm">
-<div class="sell-top">
-<div class="sell-back" onclick="goHome()">← 返回</div>
-<div class="sell-title">💰 卖废品</div>
+<div class="page" id="fm-sell">
+<div class="form-page">
+<div class="form-header">
+<div class="form-back" onclick="goHome()">← 返回</div>
+<div class="form-title">💰 卖废品</div>
 <div class="sell-summary" id="sell-summary" style="display:none">已选<b id="ss-count">0</b>条</div>
 </div>
+<div class="form-body">
 <div class="ig"><label>卖出日期</label><input type="date" id="sd"></div>
 <div class="ig"><label>备注</label><input type="text" id="sn" placeholder="卖给谁了..."></div>
 <div style="font-size:14px;color:var(--s);margin-bottom:8px">勾选卖掉的废品：</div>
 <div class="sell-scroll" id="slist"></div>
 </div>
-<div class="sell-bottom" id="sell-bottom">
-<div class="sell-bottom-row">
-<div class="sell-bottom-sum">
-<span class="sbs-yuan">¥</span><input type="number" id="sa" placeholder="45.5" step="0.1" min="0.1">
+<div class="form-foot">
+<div class="sell-amount-row">
+<div class="sell-amount-input">
+<span class="say">¥</span><input type="number" id="sa" placeholder="45.5" step="0.1" min="0.1">
 </div>
 <button class="btn o" onclick="svS()" id="sell-btn" disabled>💰 记卖出</button>
 </div>
 </div>
-</div></div>
+</div>
+</div>
 
 <!-- Expense Form -->
-<div class="page" id="fm-expense"><div class="fm">
-<div class="fb" onclick="goHome()">← 返回</div><div class="ft">💸 记支出</div>
+<div class="page" id="fm-expense">
+<div class="form-page">
+<div class="form-header">
+<div class="form-back" onclick="goHome()">← 返回</div>
+<div class="form-title">💸 记支出</div>
+</div>
+<div class="form-body">
 <div class="ig"><label>类别</label><select id="ec"><option>🥬 买菜</option><option>🧴 日用品</option><option>🚌 交通</option><option>💊 医疗</option><option>💡 水电</option><option>📱 话费</option><option>📌 其他</option></select></div>
 <div class="ig"><label>金额</label><input type="number" id="ea" placeholder="32.5" step="0.1" min="0.1"></div>
 <div class="ig"><label>备注</label><input type="text" id="en" placeholder="在哪买的..."></div>
-<button class="btn g lg" onclick="svE()">✅ 记一笔</button>
-</div></div>
+</div>
+<div class="form-foot">
+<button class="btn g" onclick="svE()">✅ 记一笔</button>
+</div>
+</div>
+</div>
 
 <div class="toast" id="toast"></div>
-<div class="tab">
+<div class="tab" id="tab-bar">
 <div class="tb on" data-t="home" onclick="nav('home')"><span class="ti">🏠</span><span class="tl">首页</span></div>
 <div class="tb" data-t="hist" onclick="nav('hist')"><span class="ti">📋</span><span class="tl">流水</span></div>
 <div class="tb ctr" onclick="openAct()"><span class="ti">＋</span></div>
@@ -290,6 +314,7 @@ function openFm(f){
 }
 function goHome(){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tab-bar').style.display='flex';
   document.getElementById('home').classList.add('on');loadHome();window.scrollTo(0,0);
 }
 
@@ -327,6 +352,7 @@ function upSS(){
     document.getElementById('ss-count').textContent=cnt;
   }else{summary.style.display='none'}
   btn.disabled=!cnt||!sa.value||parseFloat(sa.value)<=0;
+  document.getElementById('sell-btn').style.opacity=btn.disabled?'.45':'1';
 }
 // monitor amount input
 document.addEventListener('DOMContentLoaded',()=>{const sa=document.getElementById('sa');if(sa)sa.addEventListener('input',()=>upSS())});
@@ -366,7 +392,7 @@ async function loadHome(){
     <div class="scard wide"><div class="sw-icon">🗑️</div><div class="sw-info"><div class="sl">待卖废品</div><div class="sv g">${uc} 条</div></div></div>`;
   const rd=document.getElementById('recent');
   if(!rw?.length){rd.innerHTML='<div class="empty"><div class="ee">📝</div><div class="et">点 ＋ 开始记账</div></div>';return}
-  rd.innerHTML=rw.map(r=>`<div class="item" onclick="showDet(${r.id})"><div class="ii w">📦</div><div class="it"><div class="it-t">${r.waste_type} ${r.quantity}${r.unit}</div><div class="it-d">${ta(r.created_at)}${r.notes?' · '+r.notes:''}</div></div>${r.sold?'<span style="font-size:13px;color:var(--s)">已卖</span>':'<button class="sell-btn" onclick="event.stopPropagation();quickS('+r.id+')">卖</button>'}</div>`).join('')
+  rd.innerHTML=rw.map(r=>`<div class="item" onclick="showDet(${r.id})"><div class="ii w">📦</div><div class="it"><div class="it-t">${r.waste_type} ${r.quantity}${r.unit}</div><div class="it-d"><span>${ta(r.created_at)}</span>${r.notes?`<span class="dot"></span><span>${r.notes}</span>`:''}</div></div>${r.sold?'<span class="ia" style="font-size:13px;color:var(--s)">已卖</span>':'<button class="sell-btn" onclick="event.stopPropagation();quickS('+r.id+')">卖</button>'}</div>`).join('')
 }
 
 function ta(t){const d=new Date(t),n=new Date(),diff=n-d;if(diff<6e4)return'刚刚';if(diff<36e5)return Math.floor(diff/6e4)+'分前';if(diff<864e5)return Math.floor(diff/36e5)+'时前';if(diff<1728e5)return'昨天';if(diff<6048e5)return Math.floor(diff/864e5)+'天前';return d.toLocaleDateString('zh-CN')}
@@ -412,9 +438,9 @@ function renderH(data,ft){
   if(!data.length){d.innerHTML='<div class="empty"><div class="ee">📭</div><div class="et">暂无记录</div></div>';return}
   d.innerHTML=data.map(r=>{
     const t=ft||r._t;
-    if(t==='waste')return`<div class="item" onclick="showDet(${r.id})"><div class="ii w">📦</div><div class="it"><div class="it-t">${r.waste_type} ${r.quantity}${r.unit}</div><div class="it-d">${ta(r.created_at)}${r.notes?' · '+r.notes:''}</div></div>${r.sold?'<span style="font-size:13px;color:var(--s)">已卖</span>':'<button class="sell-btn" onclick="event.stopPropagation();quickS('+r.id+')">卖</button>'}</div>`;
-    if(t==='sell')return`<div class="item"><div class="ii s">💰</div><div class="it"><div class="it-t">卖废品</div><div class="it-d">${ta(r.created_at)}${r.notes?' · '+r.notes:''}</div></div><div class="ia o">+¥${r.total_amount}</div></div>`;
-    if(t==='expense')return`<div class="item"><div class="ii e">💸</div><div class="it"><div class="it-t">${r.category}</div><div class="it-d">${ta(r.created_at)}${r.notes?' · '+r.notes:''}</div></div><div class="ia n">-¥${r.amount}</div></div>`;
+    if(t==='waste')return`<div class="item" onclick="showDet(${r.id})"><div class="ii w">📦</div><div class="it"><div class="it-t">${r.waste_type} ${r.quantity}${r.unit}</div><div class="it-d"><span>${ta(r.created_at)}</span>${r.notes?`<span class="dot"></span><span>${r.notes}</span>`:''}</div></div>${r.sold?'<span class="ia" style="font-size:13px;color:var(--s)">已卖</span>':'<button class="sell-btn" onclick="event.stopPropagation();quickS('+r.id+')">卖</button>'}</div>`;
+    if(t==='sell')return`<div class="item"><div class="ii s">💰</div><div class="it"><div class="it-t">卖废品</div><div class="it-d"><span>${ta(r.created_at)}</span>${r.notes?`<span class="dot"></span><span>${r.notes}</span>`:''}</div></div><div class="ia o">+¥${r.total_amount}</div></div>`;
+    if(t==='expense')return`<div class="item"><div class="ii e">💸</div><div class="it"><div class="it-t">${r.category}</div><div class="it-d"><span>${ta(r.created_at)}</span>${r.notes?`<span class="dot"></span><span>${r.notes}</span>`:''}</div></div><div class="ia n">-¥${r.amount}</div></div>`;
     if(t==='salary')return`<div class="item"><div class="ii sa">💼</div><div class="it"><div class="it-t">工资 · ${r.month}</div><div class="it-d">${ta(r.created_at)}</div></div><div class="ia p">+¥${r.amount}</div></div>`;
   }).join('')
 }
