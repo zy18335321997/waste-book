@@ -116,6 +116,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 .sab .sabb{flex:1;padding:12px;border-radius:12px;font-size:14px;font-weight:700;color:#fff;background:var(--w);border:none;cursor:pointer;text-align:center;font-family:inherit}
 .sab .sabb:active{opacity:.85}
 
+/* Sell top */
+.sell-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.sell-summary{display:flex;gap:12px;background:var(--gb);padding:8px 14px;border-radius:10px;font-size:13px;color:var(--g)}
+.sell-summary b{font-size:15px}
+
+/* Sell bottom */
+#fm-sell .fm{padding-bottom:140px}
+.sell-bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:440px;width:100%;background:var(--c);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--b);z-index:90;box-shadow:0 -2px 10px rgba(0,0,0,.04)}
+.sell-bottom-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.sell-bottom-sum{flex:1}
+.sbs-label{display:block;font-size:12px;color:var(--s);margin-bottom:4px}
+.sbs-input-wrap{display:flex;align-items:center;background:var(--bg);border-radius:10px;padding:0 12px;border:1.5px solid var(--b)}
+.sbs-input-wrap:focus-within{border-color:var(--g)}
+.sbs-yuan{font-size:20px;font-weight:700;color:var(--w)}
+.sbs-input-wrap input{flex:1;border:none;background:transparent;padding:12px 8px;font-size:22px;font-weight:700;font-family:inherit;width:100%;outline:none}
+.sell-bottom-row .btn{flex-shrink:0;width:auto;padding:14px 28px;font-size:16px;border-radius:12px}
+.sell-bottom-row .btn:disabled{opacity:.45}
+.sell-bottom-note input{width:100%;padding:10px 14px;border:1.5px solid var(--b);border-radius:10px;font-size:14px;font-family:inherit;background:var(--c);outline:none}
+.sell-bottom-note input:focus{border-color:var(--g)}
+
 /* Detail */
 .detail-img{width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin:10px 0}
 .detail-type{font-size:20px;font-weight:800;margin-bottom:4px}
@@ -205,12 +225,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 
 <!-- Sell Form -->
 <div class="page" id="fm-sell"><div class="fm">
-<div class="fb" onclick="goHome()">← 返回</div><div class="ft">💰 卖废品</div>
+<div class="sell-top">
+<div class="fb" onclick="goHome()">← 返回</div>
+<div class="sell-summary" id="sell-summary" style="display:none">
+<span class="ss-count">已选 <b id="ss-count">0</b> 条</span>
+<span class="ss-weight">共 <b id="ss-weight">0</b>斤</span>
+</div>
+</div>
+<div class="ft">💰 卖废品</div>
+<div class="ig" style="margin-top:4px"><label>卖出日期</label><input type="date" id="sd"></div>
 <div style="font-size:14px;color:var(--s);margin-bottom:8px">勾选这次卖掉的废品：</div>
 <div class="sell-scroll" id="slist"></div>
-<div class="ig" style="margin-top:10px"><label>总共卖了多少钱</label><input type="number" id="sa" placeholder="45.5" step="0.1" min="0.1"></div>
-<div class="ig"><label>备注</label><input type="text" id="sn" placeholder="卖给谁了..."></div>
-<button class="btn o lg" onclick="svS()">💰 记卖出</button>
+</div>
+<div class="sell-bottom" id="sell-bottom">
+<div class="sell-bottom-row">
+<div class="sell-bottom-sum">
+<span class="sbs-label">卖了多少钱</span>
+<div class="sbs-input-wrap"><span class="sbs-yuan">¥</span><input type="number" id="sa" placeholder="45.5" step="0.1" min="0.1"></div>
+</div>
+<button class="btn o" onclick="svS()" id="sell-btn" disabled>记卖出</button>
+</div>
+<div class="sell-bottom-note"><input type="text" id="sn" placeholder="备注：卖给谁了..."></div>
+</div>
 </div></div>
 
 <!-- Expense Form -->
@@ -277,21 +313,40 @@ async function svW(){
 async function loadUSell(){
   const{data}=await sb.from('waste_records').select('*').eq('sold',false).order('created_at',{ascending:false});
   const d=document.getElementById('slist');
-  if(!data?.length){d.innerHTML='<div class="empty"><div class="ee">🎉</div><div class="et">没有待卖的废品</div></div>';sellSet=new Set();return}
-  // Pre-select items from sellSet if any
+  // Set today date
+  document.getElementById('sd').value=new Date().toISOString().slice(0,10);
+  if(!data?.length){d.innerHTML='<div class="empty"><div class="ee">🎉</div><div class="et">没有待卖的废品</div></div>';sellSet=new Set();upSS();return}
+  window._sellData=data;
   d.innerHTML=data.map(r=>`<div class="sc${sellSet.has(r.id)?' sel':''}" data-id="${r.id}" onclick="togS(this,${r.id})"><div class="sd">✓</div><div class="si"><div class="sit">${r.waste_type} ${r.quantity}${r.unit}</div><div class="sis">${new Date(r.created_at).toLocaleDateString('zh-CN')} ${r.notes||''}</div></div></div>`).join('');
+  upSS();
 }
-function togS(el,id){if(sellSet.has(id)){sellSet.delete(id);el.classList.remove('sel')}else{sellSet.add(id);el.classList.add('sel')}}
+function togS(el,id){if(sellSet.has(id)){sellSet.delete(id);el.classList.remove('sel')}else{sellSet.add(id);el.classList.add('sel')};upSS()}
+function upSS(){
+  const cnt=sellSet.size;
+  const summary=document.getElementById('sell-summary');
+  const btn=document.getElementById('sell-btn');
+  const sa=document.getElementById('sa');
+  if(cnt>0){
+    summary.style.display='flex';
+    document.getElementById('ss-count').textContent=cnt;
+    let tw=0;
+    if(window._sellData) sellSet.forEach(id=>{const r=window._sellData.find(x=>x.id===id);if(r)tw+=Number(r.quantity||0)});
+    document.getElementById('ss-weight').textContent=tw.toFixed(1);
+  }else{summary.style.display='none'}
+  btn.disabled=!cnt||!sa.value||parseFloat(sa.value)<=0;
+}
+// monitor amount input
+document.addEventListener('DOMContentLoaded',()=>{const sa=document.getElementById('sa');if(sa)sa.addEventListener('input',()=>upSS())});
 
 async function svS(){
   if(!sellSet.size)return toast('请勾选卖掉的废品');
   const a=parseFloat(document.getElementById('sa').value);if(!a||a<=0)return toast('请输入金额');
   const n=document.getElementById('sn').value;
-  const{data:s,error:se}=await sb.from('waste_sales').insert({total_amount:a,notes:n}).select('id').single();
-  if(se)toast('失败');else{
-    await sb.from('waste_records').update({sold:true,sale_id:s.id}).in('id',Array.from(sellSet));
-    toast('💰 卖出成功！');sellSet=new Set();['sa','sn'].forEach(id=>document.getElementById(id).value='');
-  }
+  const sd=document.getElementById('sd').value||new Date().toISOString().slice(0,10);
+  const{data:s,error:se}=await sb.from('waste_sales').insert({total_amount:a,notes:n,created_at:sd+'T'+(new Date()).toTimeString().slice(0,8)}).select('id').single();
+  if(se){return toast('失败')}
+  await sb.from('waste_records').update({sold:true,sale_id:s.id}).in('id',Array.from(sellSet));
+  toast('💰 卖出成功！');sellSet=new Set();['sa','sn'].forEach(id=>document.getElementById(id).value='');
   goHome();
 }
 
