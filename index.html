@@ -211,7 +211,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 <div class="insight" id="sinsight"></div>
 <div class="sec"><div class="sh-t">本月明细</div><div id="sdetail"></div></div>
 </div>
-</div>
 
 <!-- Modal -->
 <div class="modal" id="act-modal" onclick="closeAct()">
@@ -439,6 +438,7 @@ async function loadHome(reset){
   const now=new Date(),today=now.toISOString().slice(0,10),m=now.toISOString().slice(0,7);
   const dow=now.getDay(),ws=new Date(now);ws.setDate(now.getDate()-(dow===0?6:dow-1));ws.setHours(0,0,0,0);
   const wk=ws.toISOString().slice(0,10);
+  const nm=new Date(m+'-01');nm.setMonth(nm.getMonth()+1);const ne=nm.toISOString().slice(0,10);
   // Stats: only fetch on first page
   if(homePage===0){
     let td,wkSell,uc,wi=0,me=0;
@@ -448,8 +448,8 @@ async function loadHome(reset){
         sb.from('waste_records').select('id',{count:'exact',head:true}).gte('created_at',today).lte('created_at',today+'T23:59:59'),
         sb.from('waste_sales').select('total_amount').gte('created_at',wk),
         sb.from('waste_records').select('id',{count:'exact',head:true}).eq('sold',false),
-        sb.from('waste_sales').select('total_amount').gte('created_at',m+'-01').lte('created_at',m+'-31'),
-        sb.from('expenses').select('amount').gte('created_at',m+'-01').lte('created_at',m+'-31')
+        sb.from('waste_sales').select('total_amount').gte('created_at',m+'-01').lt('created_at',ne),
+        sb.from('expenses').select('amount').gte('created_at',m+'-01').lt('created_at',ne)
       ]);
       td=tc||0;wkSell=wks?.reduce((s,r)=>s+Number(r.total_amount),0)||0;uc=c||0;wi=sm?.reduce((s,r)=>s+Number(r.total_amount),0)||0;me=em?.reduce((s,r)=>s+Number(r.amount),0)||0;
       statsCache={td,wkSell,uc,wi,me};statsDay=today;
@@ -559,12 +559,13 @@ function sellAll(){const uu=aW.filter(r=>!r.sold);if(!uu.length)return toast('�
 function chM(d){const[y,m]=cM.split('-').map(Number);cM=new Date(y,m-1+d,1).toISOString().slice(0,7);loadSum()}
 async function loadSum(){
   document.getElementById('smonth').textContent=cM.replace('-','年')+'月';
-  const s=cM+'-01',e=cM+'-31';
+  const s=cM+'-01';
+  const d=new Date(s);d.setMonth(d.getMonth()+1);const e=d.toISOString().slice(0,10);
   const[{data:sl},{data:ex},{data:sa},{data:wa}]=await Promise.all([
-    sb.from('waste_sales').select('*').gte('created_at',s).lte('created_at',e).order('created_at',{ascending:false}),
-    sb.from('expenses').select('*').gte('created_at',s).lte('created_at',e).order('created_at',{ascending:false}),
+    sb.from('waste_sales').select('*').gte('created_at',s).lt('created_at',e).order('created_at',{ascending:false}),
+    sb.from('expenses').select('*').gte('created_at',s).lt('created_at',e).order('created_at',{ascending:false}),
     sb.from('salary_records').select('*').eq('month',cM),
-    sb.from('waste_records').select('*').gte('created_at',s).lte('created_at',e).order('created_at',{ascending:false})
+    sb.from('waste_records').select('*').gte('created_at',s).lt('created_at',e).order('created_at',{ascending:false})
   ]);
   const wi=sl?.reduce((a,r)=>a+Number(r.total_amount),0)||0,si=sa?.reduce((a,r)=>a+Number(r.amount),0)||0,me=ex?.reduce((a,r)=>a+Number(r.amount),0)||0,bal=wi+si-me;
   document.getElementById('sstats').innerHTML=`<div class="scard"><div class="sl">总收入</div><div class="sv g">¥${wi+si}</div></div><div class="scard"><div class="sl">总支出</div><div class="sv r">¥${me}</div></div><div class="scard wide"><div class="sw-icon">💰</div><div class="sw-info"><div class="sl">废品收入 ¥${wi} · 工资 ¥${si}</div><div class="sv g">结余 ¥${bal}</div></div></div>`;
