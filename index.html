@@ -240,7 +240,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 <div class="ig"><label>备注</label><input type="text" id="rn" placeholder="在哪捡的..."></div>
 </div>
 <div class="form-foot">
-<button class="btn g" onclick="svW()">✅ 记一笔</button>
+<button class="btn g" id="svW-btn" onclick="svW()">✅ 记一笔</button>
 </div>
 </div>
 </div>
@@ -283,7 +283,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei
 <div class="ig"><label>备注</label><input type="text" id="en" placeholder="在哪买的..."></div>
 </div>
 <div class="form-foot">
-<button class="btn g" onclick="svE()">✅ 记一笔</button>
+<button class="btn g" id="svE-btn" onclick="svE()">✅ 记一笔</button>
 </div>
 </div>
 </div>
@@ -323,11 +323,12 @@ function openFm(f){
   if(f==='sell'){loadUSell()}else{sellSet=new Set()}
   window.scrollTo(0,0);
 }
-function goHome(){
+function goHome(skipReload){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.getElementById('tab-bar').style.display='flex';
   document.getElementById('home').classList.add('on');
-  loadHome(true);window.scrollTo(0,0);
+  window.scrollTo(0,0);
+  if(!skipReload){statsCache=null;loadHome(true)}
 }
 
 function gotP(e){const f=e.target.files[0];if(!f)return;pf=f;const r=new FileReader();r.onload=ev=>{document.getElementById('pi').src=ev.target.result;['pi','pr'].forEach(id=>document.getElementById(id).style.display='block');['pe','pt'].forEach(id=>document.getElementById(id).style.display='none')};r.readAsDataURL(f)}
@@ -336,11 +337,45 @@ function pickC(c){document.querySelectorAll('#chips .chip').forEach(x=>x.classLi
 
 async function svW(){
   const q=parseFloat(document.getElementById('rq').value);if(!q||q<=0)return toast('请输入数量');
-  const u=document.getElementById('ru').value,n=document.getElementById('rn').value;let url='';
-  if(pf){const x=pf.name.split('.').pop(),fn='w_'+Date.now()+'.'+x;const{error:ue}=await sb.storage.from('waste-photos').upload(fn,pf);if(!ue){const{data:d}=sb.storage.from('waste-photos').getPublicUrl(fn);url=d?.publicUrl||''}}
-  const{error}=await sb.from('waste_records').insert({waste_type:wtype,quantity:q,unit:u,photo_url:url,notes:n});
-  if(error)toast('失败');else{toast('✅ 记好了！');resetP();['rq','rn'].forEach(id=>document.getElementById(id).value='')}
-  goHome();
+  const u=document.getElementById('ru').value,n=document.getElementById('rn').value;
+  document.getElementById('svW-btn').textContent='提交中...';document.getElementById('svW-btn').disabled=true;
+  // Compress photo in background, insert first
+  let url='';
+  const insertAndGo=async()=>{
+    const{error,data}=await sb.from('waste_records').insert({waste_type:wtype,quantity:q,unit:u,photo_url:url,notes:n}).select('id,waste_type,quantity,unit,photo_url,notes,sold,created_at').single();
+    if(error){toast('失败');document.getElementById('svW-btn').textContent='✅ 记一笔';document.getElementById('svW-btn').disabled=false;return}
+    toast('✅ 记好了！');resetP();['rq','rn'].forEach(id=>document.getElementById(id).value='');
+    // Prepend to home page
+    const card=renderCard(data);
+    const rd=document.getElementById('recent');
+    if(rd.children[0]&&rd.children[0].classList.contains('empty'))rd.innerHTML=card;
+    else rd.insertAdjacentHTML('afterbegin',card);
+    goHome(false);
+  };
+  if(pf){
+    // Compress before upload
+    const blob=await compressImage(pf,800,0.7);
+    const x=pf.name.split('.').pop(),fn='w_'+Date.now()+'.jpg';
+    sb.storage.from('waste-photos').upload(fn,blob).then(async r=>{
+      if(!r.error){const{data:d}=sb.storage.from('waste-photos').getPublicUrl(fn);url=d?.publicUrl||''}
+    }).finally(()=>{});
+    // Don't wait for upload, insert immediately
+    insertAndGo();
+  }else{insertAndGo()}
+}
+
+async function compressImage(file,maxW,qty){
+  return new Promise(resolve=>{
+    const img=new Image(),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+    img.onload=()=>{
+      let w=img.width,h=img.height;
+      if(w>maxW){h=h*maxW/w;w=maxW}
+      canvas.width=w;canvas.height=h;
+      ctx.drawImage(img,0,0,w,h);
+      canvas.toBlob(b=>resolve(b||file),'image/jpeg',qty);
+    };
+    img.src=URL.createObjectURL(file);
+  });
 }
 
 async function loadUSell(){
@@ -374,19 +409,22 @@ async function svS(){
   const a=parseFloat(document.getElementById('sa').value);if(!a||a<=0)return toast('请输入金额');
   const n=document.getElementById('sn').value;
   const sd=document.getElementById('sd').value||new Date().toISOString().slice(0,10);
+  document.getElementById('sell-btn').textContent='提交中...';document.getElementById('sell-btn').disabled=true;
   const{data:s,error:se}=await sb.from('waste_sales').insert({total_amount:a,notes:n,created_at:sd+'T'+(new Date()).toTimeString().slice(0,8)}).select('id').single();
-  if(se){return toast('失败')}
+  if(se){document.getElementById('sell-btn').textContent='💰 记卖出';document.getElementById('sell-btn').disabled=false;return toast('失败')}
   await sb.from('waste_records').update({sold:true,sale_id:s.id}).in('id',Array.from(sellSet));
   toast('💰 卖出成功！');sellSet=new Set();['sa','sn'].forEach(id=>document.getElementById(id).value='');
-  goHome();
+  goHome(true);
 }
 
 async function svE(){
   const a=parseFloat(document.getElementById('ea').value);if(!a||a<=0)return toast('请输入金额');
   const c=document.getElementById('ec').value.replace(/^[^\s]+\s/,''),n=document.getElementById('en').value;
+  document.getElementById('svE-btn').textContent='提交中...';document.getElementById('svE-btn').disabled=true;
   const{error}=await sb.from('expenses').insert({category:c,amount:a,notes:n});
+  document.getElementById('svE-btn').textContent='✅ 记一笔';document.getElementById('svE-btn').disabled=false;
   if(error)toast('失败');else{toast('✅ 记好了！');['ea','en'].forEach(id=>document.getElementById(id).value='')}
-  goHome();
+  goHome(true);
 }
 
 let homePage=0,homeDone=false,homeLoading=false,statsCache=null,statsMonth='';
@@ -451,7 +489,7 @@ async function showDet(id){
 }
 function closeDet(){document.getElementById('det-modal').classList.remove('show')}
 function quickS(id){sellSet=new Set([id]);openFm('sell');closeDet();closeAct()}
-async function delR(id){if(!confirm('确定删除？'))return;await sb.from('waste_records').delete().eq('id',id);toast('已删除');closeDet();loadHist();loadHome(true)}
+async function delR(id){if(!confirm('确定删除？'))return;await sb.from('waste_records').delete().eq('id',id);toast('已删除');closeDet();loadHist();goHome()}
 
 async function loadHist(){
   const f=filt,showS=(f==='all'||f==='waste');
